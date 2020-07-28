@@ -33,6 +33,7 @@ router.post('/register', async (req, res) => {
     } catch (err) {
         res.status(400).send(err);
     }
+    // create a token here too like in login
 
 });
 
@@ -52,11 +53,24 @@ router.post('/login', async (req, res) => {
     if (!validPass) return res.status(400).send('Password is invalid');
 
     //create and assign a token
-    const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
+    const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET, { expiresIn: process.env.TOKEN_LIFE });
+    const refreshToken = jwt.sign({ _id: user._id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: process.env.REFRESH_TOKEN_LIFE })
     res.cookie('token', token, { // store it in an https only cookie
         secure: false, // set to true if your using https
-        httpOnly: true,
-    }).send(token);
+        httpOnly: true
+    });
+    res.cookie('refresh-token', refreshToken, {
+        secure: false,
+        httpOnly: true
+    })
+
+    const response = {
+        "status": "Logged in",
+        "token": token,
+        "refreshToken": refreshToken
+    }
+
+    res.status(200).json(response);
     // res.header('auth-token', token).send(token);
 });
 

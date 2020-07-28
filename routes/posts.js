@@ -1,8 +1,9 @@
 const router = require('express').Router();
-const verify = require('./verifyToken');
+const { verifyToken, generateTokens } = require('./verifyToken');
 const User = require('../models/User');
 
-router.get('/', verify, async (req, res) => { // protecting this route by require token
+router.get('/', verifyToken, async (req, res) => { // protecting this route by require token
+
 
     // here I can get access to user on client side by saying req.user
     // then doing findOne and sending the ejs file while passing in the user
